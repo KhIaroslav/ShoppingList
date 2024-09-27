@@ -1,6 +1,5 @@
 package com.khiaroslav.shoppinglist.presentation
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 import com.khiaroslav.shoppinglist.data.ShopListRepositoryImpl //??????
