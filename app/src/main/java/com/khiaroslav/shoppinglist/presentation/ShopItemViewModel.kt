@@ -30,19 +30,18 @@ class ShopItemViewModel : ViewModel() {
         get() = _shopItem
 
     private val _shouldCloseScreen = MutableLiveData<Unit>()
-    val close: LiveData<Unit>
+    val shouldCloseScreen: LiveData<Unit>
         get() = _shouldCloseScreen
 
     fun getShopItem(shopItemId: Int) {
-        val shopItem = getShopItemUseCase.getShopItemUseCase(shopItemId)
-        _shopItem.value = shopItem
+        val item = getShopItemUseCase.getShopItem(shopItemId)
+        _shopItem.value = item
     }
 
     fun addShopItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
         val fieldsValid = validateInput(name, count)
-
         if (fieldsValid) {
             val shopItem = ShopItem(name, count, true)
             addShopItemUseCase.addShopItem(shopItem)
@@ -54,14 +53,11 @@ class ShopItemViewModel : ViewModel() {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
         val fieldsValid = validateInput(name, count)
-
         if (fieldsValid) {
             _shopItem.value?.let {
                 val item = it.copy(name = name, count = count)
                 editShopItemUseCase.editShopItem(item)
                 finishWork()
-            } ?: run {
-                throw RuntimeException("Error editShopItem because shopItem is null")
             }
         }
     }
@@ -71,7 +67,11 @@ class ShopItemViewModel : ViewModel() {
     }
 
     private fun parseCount(inputCount: String?): Int {
-        return inputCount?.trim()?.toIntOrNull() ?: 0
+        return try {
+            inputCount?.trim()?.toInt() ?: 0
+        } catch (e: Exception) {
+            0
+        }
     }
 
     private fun validateInput(name: String, count: Int): Boolean {
@@ -87,11 +87,11 @@ class ShopItemViewModel : ViewModel() {
         return result
     }
 
-    fun resetInputName() {
+    fun resetErrorInputName() {
         _errorInputName.value = false
     }
 
-    fun resetInputCount() {
+    fun resetErrorInputCount() {
         _errorInputCount.value = false
     }
 

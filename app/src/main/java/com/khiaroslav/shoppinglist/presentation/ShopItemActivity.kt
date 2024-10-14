@@ -9,24 +9,27 @@ import com.khiaroslav.shoppinglist.domain.ShopItem
 
 class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
-    private var screeMode: String = MODE_UNKNOWN
-    private var shopItemId: Int = ShopItem.UNDEFINED_ID
+    private var screenMode = MODE_UNKNOWN
+    private var shopItemId = ShopItem.UNDEFINED_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
         parseIntent()
-
         if (savedInstanceState == null) {
             launchRightMode()
         }
     }
 
+    override fun onEditingFinished() {
+        finish()
+    }
+
     private fun launchRightMode() {
-        val fragment = when (screeMode) {
+        val fragment = when (screenMode) {
             MODE_EDIT -> ShopItemFragment.newInstanceEditItem(shopItemId)
-            MODE_ADD -> ShopItemFragment.newInstanceAddItem()
-            else -> throw RuntimeException("Unknown screen mode $screeMode")
+            MODE_ADD  -> ShopItemFragment.newInstanceAddItem()
+            else      -> throw RuntimeException("Unknown screen mode $screenMode")
         }
         supportFragmentManager.beginTransaction()
             .replace(R.id.shop_item_container, fragment)
@@ -41,9 +44,8 @@ class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinished
         if (mode != MODE_EDIT && mode != MODE_ADD) {
             throw RuntimeException("Unknown screen mode $mode")
         }
-        screeMode = mode
-
-        if (screeMode == MODE_EDIT) {
+        screenMode = mode
+        if (screenMode == MODE_EDIT) {
             if (!intent.hasExtra(EXTRA_SHOP_ITEM_ID)) {
                 throw RuntimeException("Param shop item id is absent")
             }
@@ -52,6 +54,7 @@ class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinished
     }
 
     companion object {
+
         private const val EXTRA_SCREEN_MODE = "extra_mode"
         private const val EXTRA_SHOP_ITEM_ID = "extra_shop_item_id"
         private const val MODE_EDIT = "mode_edit"
@@ -70,9 +73,5 @@ class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinished
             intent.putExtra(EXTRA_SHOP_ITEM_ID, shopItemId)
             return intent
         }
-    }
-
-    override fun onEditingFinished() {
-        finish()
     }
 }
